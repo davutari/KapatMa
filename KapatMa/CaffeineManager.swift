@@ -116,7 +116,14 @@ class CaffeineManager: ObservableObject {
         countdownTimer = nil
 
         if let proc = process, proc.isRunning {
-            proc.terminate()
+            let pid = proc.processIdentifier
+            proc.interrupt() // SIGINT — caffeinate responds to this reliably
+            proc.waitUntilExit()
+
+            // Safety net: if interrupt didn't work, force kill by exact PID
+            if proc.isRunning {
+                kill(pid, SIGKILL)
+            }
         }
         process = nil
         isActive = false

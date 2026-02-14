@@ -76,6 +76,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
+    func applicationWillTerminate(_ notification: Notification) {
+        caffeineManager.stop()
+    }
+
     @objc func togglePopover() {
         guard let button = statusItem.button else { return }
 
