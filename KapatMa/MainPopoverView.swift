@@ -670,44 +670,54 @@ struct QuoteEditorView: View {
 
             ScrollView {
                 VStack(spacing: 4) {
-                    ForEach(quotesManager.quotes) { quote in
-                        HStack {
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text(quote.text)
-                                    .font(.system(size: 11))
-                                    .foregroundColor(theme.textPrimary)
-                                    .lineLimit(2)
-                                if !quote.author.isEmpty {
-                                    Text("— \(quote.author)")
-                                        .font(.system(size: 10))
-                                        .foregroundColor(theme.textTertiary)
+                    if !quotesManager.customQuotes.isEmpty {
+                        ForEach(quotesManager.customQuotes) { quote in
+                            HStack {
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(quote.text)
+                                        .font(.system(size: 11))
+                                        .foregroundColor(theme.textPrimary)
+                                        .lineLimit(2)
+                                    if !quote.author.isEmpty {
+                                        Text("— \(quote.author)")
+                                            .font(.system(size: 10))
+                                            .foregroundColor(theme.textTertiary)
+                                    }
                                 }
+                                Spacer()
+                                Button(action: { quotesManager.removeQuote(id: quote.id) }) {
+                                    Image(systemName: "trash")
+                                        .font(.system(size: 10))
+                                        .foregroundColor(.red.opacity(0.7))
+                                }
+                                .buttonStyle(.plain)
                             }
-                            Spacer()
-                            Button(action: { quotesManager.removeQuote(id: quote.id) }) {
-                                Image(systemName: "trash")
-                                    .font(.system(size: 10))
-                                    .foregroundColor(.red.opacity(0.7))
-                            }
-                            .buttonStyle(.plain)
+                            .padding(8)
+                            .background(
+                                RoundedRectangle(cornerRadius: 6)
+                                    .fill(theme.cardBg)
+                            )
                         }
-                        .padding(8)
-                        .background(
-                            RoundedRectangle(cornerRadius: 6)
-                                .fill(theme.cardBg)
-                        )
+                    } else {
+                        Text(L.s(.defaultQuote))
+                            .font(.system(size: 11))
+                            .foregroundColor(theme.textTertiary)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 20)
                     }
                 }
             }
             .frame(maxHeight: 200)
 
-            HStack {
-                Spacer()
-                Button(L.s(.resetDefaults)) {
-                    quotesManager.quotes = QuotesManager.defaultQuotes
+            if !quotesManager.customQuotes.isEmpty {
+                HStack {
+                    Spacer()
+                    Button(L.s(.resetDefaults)) {
+                        quotesManager.resetCustomQuotes()
+                    }
+                    .font(.system(size: 10))
+                    .foregroundColor(theme.textTertiary)
                 }
-                .font(.system(size: 10))
-                .foregroundColor(theme.textTertiary)
             }
         }
         .padding(16)
