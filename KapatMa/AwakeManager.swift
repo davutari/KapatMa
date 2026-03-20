@@ -3,12 +3,12 @@ import Combine
 import IOKit.pwr_mgt
 import UserNotifications
 
-class CaffeineManager: ObservableObject {
+class AwakeManager: ObservableObject {
     @Published var isActive = false
     @Published var isInfinite = false
     @Published var totalSeconds: Int = 0
     @Published var remainingSeconds: Int = 0
-    @Published var selectedProfile: CaffeineProfile = .deepWork
+    @Published var selectedProfile: AwakeProfile = .deepWork
     @Published var dailyMinutes: Int = 0
     @Published var sessionCount: Int = 0
 
@@ -18,7 +18,7 @@ class CaffeineManager: ObservableObject {
 
     // MARK: - Profiles
 
-    enum CaffeineProfile: String, CaseIterable, Identifiable {
+    enum AwakeProfile: String, CaseIterable, Identifiable {
         case quickMeeting
         case deepWork
         case longCompute
@@ -147,7 +147,7 @@ class CaffeineManager: ObservableObject {
         UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
     }
 
-    func startWithProfile(_ profile: CaffeineProfile) {
+    func startWithProfile(_ profile: AwakeProfile) {
         selectedProfile = profile
         if profile == .infinite {
             start(seconds: nil)

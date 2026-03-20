@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct MainPopoverView: View {
-    @ObservedObject var caffeineManager: CaffeineManager
+    @ObservedObject var awakeManager: AwakeManager
     @ObservedObject var quotesManager: QuotesManager
     @ObservedObject var themeManager: ThemeManager
     @ObservedObject var brightnessManager: BrightnessManager
@@ -19,7 +19,7 @@ struct MainPopoverView: View {
             headerSection
             divider
 
-            if caffeineManager.isActive {
+            if awakeManager.isActive {
                 activeSessionView
             } else {
                 inactiveView
@@ -48,7 +48,7 @@ struct MainPopoverView: View {
     private var headerSection: some View {
         HStack(spacing: 10) {
             // App icon - lock metaphor
-            Text(caffeineManager.isActive ? "🔓" : "🔒")
+            Text(awakeManager.isActive ? "🔓" : "🔒")
                 .font(.title2)
 
             VStack(alignment: .leading, spacing: 1) {
@@ -62,7 +62,7 @@ struct MainPopoverView: View {
 
             Spacer()
 
-            if caffeineManager.isActive {
+            if awakeManager.isActive {
                 Text(L.s(.active))
                     .font(.system(size: 9, weight: .bold))
                     .foregroundColor(t.activeText)
@@ -99,9 +99,9 @@ struct MainPopoverView: View {
                     .frame(width: 170, height: 170)
 
                 // Progress arc
-                if !caffeineManager.isInfinite {
+                if !awakeManager.isInfinite {
                     Circle()
-                        .trim(from: 0, to: caffeineManager.progress)
+                        .trim(from: 0, to: awakeManager.progress)
                         .stroke(
                             AngularGradient(
                                 gradient: Gradient(colors: [t.accent, t.accentSecondary, t.accent]),
@@ -111,17 +111,17 @@ struct MainPopoverView: View {
                         )
                         .frame(width: 170, height: 170)
                         .rotationEffect(.degrees(-90))
-                        .animation(.linear(duration: 1), value: caffeineManager.progress)
+                        .animation(.linear(duration: 1), value: awakeManager.progress)
                         .shadow(color: themeManager.theme.palette.glow, radius: 8)
                 }
 
                 // Center
                 VStack(spacing: 4) {
-                    Text(caffeineManager.isInfinite ? "♾️" : caffeineManager.formattedRemaining)
+                    Text(awakeManager.isInfinite ? "♾️" : awakeManager.formattedRemaining)
                         .font(.system(size: 34, weight: .bold, design: .monospaced))
                         .foregroundColor(t.textPrimary)
 
-                    Text(caffeineManager.selectedProfile.localizedName(L))
+                    Text(awakeManager.selectedProfile.localizedName(L))
                         .font(.system(size: 11))
                         .foregroundColor(t.textSecondary)
 
@@ -134,7 +134,7 @@ struct MainPopoverView: View {
             .padding(.top, 10)
 
             // Stop Button
-            Button(action: { caffeineManager.stop() }) {
+            Button(action: { awakeManager.stop() }) {
                 HStack(spacing: 8) {
                     Image(systemName: "stop.fill")
                         .font(.system(size: 13))
@@ -186,8 +186,8 @@ struct MainPopoverView: View {
             GridItem(.flexible()),
             GridItem(.flexible())
         ], spacing: 8) {
-            ForEach(CaffeineManager.CaffeineProfile.allCases, id: \.self) { profile in
-                Button(action: { caffeineManager.startWithProfile(profile) }) {
+            ForEach(AwakeManager.AwakeProfile.allCases, id: \.self) { profile in
+                Button(action: { awakeManager.startWithProfile(profile) }) {
                     VStack(spacing: 5) {
                         Text(profile.icon)
                             .font(.title2)
@@ -234,8 +234,8 @@ struct MainPopoverView: View {
             }
 
             HStack(spacing: 5) {
-                ForEach(CaffeineManager.presetDurations, id: \.seconds) { preset in
-                    Button(action: { caffeineManager.start(seconds: preset.seconds) }) {
+                ForEach(AwakeManager.presetDurations, id: \.seconds) { preset in
+                    Button(action: { awakeManager.start(seconds: preset.seconds) }) {
                         Text(L.s(preset.key))
                             .font(.system(size: 11, weight: .semibold))
                             .foregroundColor(t.accent)
@@ -266,7 +266,7 @@ struct MainPopoverView: View {
                 .accentColor(t.accent)
 
             Button(action: {
-                caffeineManager.start(seconds: Int(customHours * 3600))
+                awakeManager.start(seconds: Int(customHours * 3600))
                 showCustomPicker = false
             }) {
                 HStack(spacing: 6) {
@@ -407,13 +407,13 @@ struct MainPopoverView: View {
 
     private var footerStats: some View {
         HStack {
-            Label("\(caffeineManager.sessionCount) \(L.s(.sessionCount))", systemImage: "bolt.fill")
+            Label("\(awakeManager.sessionCount) \(L.s(.sessionCount))", systemImage: "bolt.fill")
                 .font(.system(size: 10))
                 .foregroundColor(t.textTertiary)
 
             Spacer()
 
-            Label("\(L.s(.todayMinutes)) \(caffeineManager.dailyMinutes) \(L.s(.minutes))", systemImage: "clock.fill")
+            Label("\(L.s(.todayMinutes)) \(awakeManager.dailyMinutes) \(L.s(.minutes))", systemImage: "clock.fill")
                 .font(.system(size: 10))
                 .foregroundColor(t.textTertiary)
 

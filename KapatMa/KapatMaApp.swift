@@ -14,7 +14,7 @@ struct KapatMaApp: App {
 class AppDelegate: NSObject, NSApplicationDelegate {
     var statusItem: NSStatusItem!
     var popover: NSPopover!
-    var caffeineManager = CaffeineManager()
+    var awakeManager = AwakeManager()
     var quotesManager = QuotesManager()
     var themeManager = ThemeManager()
     var brightnessManager = BrightnessManager()
@@ -40,7 +40,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         popover.behavior = .transient
         popover.contentViewController = NSHostingController(
             rootView: MainPopoverView(
-                caffeineManager: caffeineManager,
+                awakeManager: awakeManager,
                 quotesManager: quotesManager,
                 themeManager: themeManager,
                 brightnessManager: brightnessManager,
@@ -71,9 +71,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func updateMenuBarIcon() {
         guard let button = statusItem.button else { return }
 
-        if caffeineManager.isActive {
-            let remaining = caffeineManager.formattedRemaining
-            let icon = caffeineManager.isInfinite ? "🔓∞" : "🔓 \(remaining)"
+        if awakeManager.isActive {
+            let remaining = awakeManager.formattedRemaining
+            let icon = awakeManager.isInfinite ? "🔓∞" : "🔓 \(remaining)"
             button.title = icon
         } else {
             button.title = "🔒"
@@ -81,7 +81,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationWillTerminate(_ notification: Notification) {
-        caffeineManager.stop()
+        awakeManager.stop()
     }
 
     @objc func togglePopover() {
