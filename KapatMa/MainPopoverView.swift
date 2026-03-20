@@ -4,6 +4,7 @@ struct MainPopoverView: View {
     @ObservedObject var caffeineManager: CaffeineManager
     @ObservedObject var quotesManager: QuotesManager
     @ObservedObject var themeManager: ThemeManager
+    @ObservedObject var brightnessManager: BrightnessManager
     @State private var showQuoteEditor = false
     @State private var showSettings = false
     @State private var customHours: Double = 1
@@ -20,6 +21,11 @@ struct MainPopoverView: View {
                 activeSessionView
             } else {
                 inactiveView
+            }
+
+            if !brightnessManager.displays.isEmpty {
+                divider
+                brightnessSection
             }
 
             divider
@@ -298,6 +304,78 @@ struct MainPopoverView: View {
         let m = Int((customHours - Double(h)) * 60)
         if m == 0 { return "\(h) saat" }
         return "\(h) saat \(m) dk"
+    }
+
+    // MARK: - Brightness Control
+
+    private var brightnessSection: some View {
+        VStack(spacing: 10) {
+            HStack {
+                Image(systemName: "sun.max.fill")
+                    .foregroundColor(t.accent)
+                    .font(.system(size: 12))
+                Text("Ekran Parlaklığı")
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundColor(t.textSecondary)
+                Spacer()
+                Button(action: { brightnessManager.refreshDisplays() }) {
+                    Image(systemName: "arrow.clockwise")
+                        .font(.system(size: 10))
+                        .foregroundColor(t.textTertiary)
+                }
+                .buttonStyle(.plain)
+            }
+
+            ForEach(brightnessManager.displays) { display in
+                VStack(spacing: 4) {
+                    HStack {
+                        Image(systemName: "display")
+                            .font(.system(size: 10))
+                            .foregroundColor(t.textTertiary)
+                        Text(display.name)
+                            .font(.system(size: 11, weight: .medium))
+                            .foregroundColor(t.textPrimary)
+                            .lineLimit(1)
+                        Spacer()
+                        Text("%\(display.brightness)")
+                            .font(.system(size: 11, weight: .semibold, design: .monospaced))
+                            .foregroundColor(t.accent)
+                            .frame(width: 38, alignment: .trailing)
+                    }
+
+                    HStack(spacing: 6) {
+                        Image(systemName: "sun.min")
+                            .font(.system(size: 9))
+                            .foregroundColor(t.textTertiary)
+
+                        Slider(
+                            value: Binding(
+                                get: { Double(display.brightness) },
+                                set: { brightnessManager.setBrightness(Int($0), for: display.id) }
+                            ),
+                            in: 0...100,
+                            step: 1
+                        )
+                        .accentColor(t.accent)
+
+                        Image(systemName: "sun.max.fill")
+                            .font(.system(size: 9))
+                            .foregroundColor(t.textTertiary)
+                    }
+                }
+                .padding(10)
+                .background(
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(t.cardBg)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 8)
+                                .stroke(t.border, lineWidth: 1)
+                        )
+                )
+            }
+        }
+        .padding(.horizontal, 18)
+        .padding(.vertical, 10)
     }
 
     // MARK: - Quotes Ticker

@@ -17,6 +17,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var caffeineManager = CaffeineManager()
     var quotesManager = QuotesManager()
     var themeManager = ThemeManager()
+    var brightnessManager = BrightnessManager()
     var timer: Timer?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
@@ -34,13 +35,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         // Create popover
         popover = NSPopover()
-        popover.contentSize = NSSize(width: 370, height: 540)
+        popover.contentSize = NSSize(width: 370, height: 620)
         popover.behavior = .transient
         popover.contentViewController = NSHostingController(
             rootView: MainPopoverView(
                 caffeineManager: caffeineManager,
                 quotesManager: quotesManager,
-                themeManager: themeManager
+                themeManager: themeManager,
+                brightnessManager: brightnessManager
             )
         )
 

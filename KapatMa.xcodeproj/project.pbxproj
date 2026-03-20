@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		688186562F6DA33C0051B865 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 688186552F6DA33C0051B865 /* IOKit.framework */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		684CEE072F411759009195C1 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -27,6 +31,7 @@
 		684CEDF42F411757009195C1 /* KapatMa.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KapatMa.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		684CEE062F411759009195C1 /* KapatMaTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KapatMaTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		684CEE102F411759009195C1 /* KapatMaUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KapatMaUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		688186552F6DA33C0051B865 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -52,6 +57,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				688186562F6DA33C0051B865 /* IOKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -78,6 +84,7 @@
 				684CEDF62F411757009195C1 /* KapatMa */,
 				684CEE092F411759009195C1 /* KapatMaTests */,
 				684CEE132F411759009195C1 /* KapatMaUITests */,
+				688186542F6DA33C0051B865 /* Frameworks */,
 				684CEDF52F411757009195C1 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -90,6 +97,14 @@
 				684CEE102F411759009195C1 /* KapatMaUITests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		688186542F6DA33C0051B865 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				688186552F6DA33C0051B865 /* IOKit.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -417,6 +432,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "KapatMa/KapatMa-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
@@ -449,6 +465,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "KapatMa/KapatMa-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
