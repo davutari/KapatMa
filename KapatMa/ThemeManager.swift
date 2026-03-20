@@ -3,14 +3,25 @@ import SwiftUI
 // MARK: - Color Palettes
 
 enum ColorPalette: String, CaseIterable, Identifiable {
-    case espresso = "Espresso"
-    case ocean = "Okyanus"
-    case sunset = "Gün Batımı"
-    case forest = "Orman"
-    case lavender = "Lavanta"
-    case cherry = "Vişne"
+    case espresso
+    case ocean
+    case sunset
+    case forest
+    case lavender
+    case cherry
 
     var id: String { rawValue }
+
+    func localizedName(_ L: LocalizationManager) -> String {
+        switch self {
+        case .espresso: return L.s(.paletteEspresso)
+        case .ocean: return L.s(.paletteOcean)
+        case .sunset: return L.s(.paletteSunset)
+        case .forest: return L.s(.paletteForest)
+        case .lavender: return L.s(.paletteLavender)
+        case .cherry: return L.s(.paletteCherry)
+        }
+    }
 
     var icon: String {
         switch self {
@@ -56,9 +67,9 @@ enum ColorPalette: String, CaseIterable, Identifiable {
 // MARK: - Theme Mode
 
 enum ThemeMode: String, CaseIterable, Identifiable {
-    case system = "Sistem"
-    case light = "Aydınlık"
-    case dark = "Karanlık"
+    case system
+    case light
+    case dark
 
     var id: String { rawValue }
 
@@ -67,6 +78,14 @@ enum ThemeMode: String, CaseIterable, Identifiable {
         case .system: return "💻"
         case .light: return "☀️"
         case .dark: return "🌙"
+        }
+    }
+
+    func localizedName(_ L: LocalizationManager) -> String {
+        switch self {
+        case .system: return L.s(.themeSystem)
+        case .light: return L.s(.themeLight)
+        case .dark: return L.s(.themeDark)
         }
     }
 }
@@ -149,8 +168,8 @@ class ThemeManager: ObservableObject {
     private let defaults = UserDefaults.standard
 
     init() {
-        let savedMode = ThemeMode(rawValue: UserDefaults.standard.string(forKey: "themeMode") ?? "") ?? .system
-        let savedPalette = ColorPalette(rawValue: UserDefaults.standard.string(forKey: "themePalette") ?? "") ?? .espresso
+        let savedMode = ThemeMode(rawValue: UserDefaults.standard.string(forKey: "themeMode") ?? "system") ?? .system
+        let savedPalette = ColorPalette(rawValue: UserDefaults.standard.string(forKey: "themePalette") ?? "espresso") ?? .espresso
 
         self.mode = savedMode
         self.palette = savedPalette

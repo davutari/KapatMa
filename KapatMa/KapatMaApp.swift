@@ -18,6 +18,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var quotesManager = QuotesManager()
     var themeManager = ThemeManager()
     var brightnessManager = BrightnessManager()
+    var localizationManager = LocalizationManager.shared
     var timer: Timer?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
@@ -42,7 +43,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 caffeineManager: caffeineManager,
                 quotesManager: quotesManager,
                 themeManager: themeManager,
-                brightnessManager: brightnessManager
+                brightnessManager: brightnessManager,
+                localizationManager: localizationManager
             )
         )
 

@@ -109,7 +109,7 @@ class BrightnessManager: ObservableObject {
 
     private static func getDisplayName(_ displayID: CGDirectDisplayID) -> String {
         guard let cName = DDCGetDisplayName(displayID) else {
-            return "Harici Monitör"
+            return LocalizationManager.shared.s(.externalMonitor)
         }
         let name = String(cString: cName)
         free(cName)

@@ -5,12 +5,14 @@ struct MainPopoverView: View {
     @ObservedObject var quotesManager: QuotesManager
     @ObservedObject var themeManager: ThemeManager
     @ObservedObject var brightnessManager: BrightnessManager
+    @ObservedObject var localizationManager: LocalizationManager
     @State private var showQuoteEditor = false
     @State private var showSettings = false
     @State private var customHours: Double = 1
     @State private var showCustomPicker = false
 
     private var t: AppTheme { themeManager.theme }
+    private var L: LocalizationManager { localizationManager }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -53,7 +55,7 @@ struct MainPopoverView: View {
                 Text("Kapat.ma")
                     .font(.system(size: 15, weight: .bold))
                     .foregroundColor(t.textPrimary)
-                Text("Ekranını kapatma!")
+                Text(L.s(.appTagline))
                     .font(.system(size: 9))
                     .foregroundColor(t.textTertiary)
             }
@@ -61,7 +63,7 @@ struct MainPopoverView: View {
             Spacer()
 
             if caffeineManager.isActive {
-                Text("AKTİF")
+                Text(L.s(.active))
                     .font(.system(size: 9, weight: .bold))
                     .foregroundColor(t.activeText)
                     .padding(.horizontal, 8)
@@ -79,7 +81,7 @@ struct MainPopoverView: View {
             }
             .buttonStyle(.plain)
             .popover(isPresented: $showSettings) {
-                SettingsView(themeManager: themeManager, quotesManager: quotesManager)
+                SettingsView(themeManager: themeManager, quotesManager: quotesManager, localizationManager: localizationManager)
             }
         }
         .padding(.horizontal, 18)
@@ -119,7 +121,7 @@ struct MainPopoverView: View {
                         .font(.system(size: 34, weight: .bold, design: .monospaced))
                         .foregroundColor(t.textPrimary)
 
-                    Text(caffeineManager.selectedProfile.rawValue)
+                    Text(caffeineManager.selectedProfile.localizedName(L))
                         .font(.system(size: 11))
                         .foregroundColor(t.textSecondary)
 
@@ -136,7 +138,7 @@ struct MainPopoverView: View {
                 HStack(spacing: 8) {
                     Image(systemName: "stop.fill")
                         .font(.system(size: 13))
-                    Text("Durdur")
+                    Text(L.s(.stopButton))
                         .font(.system(size: 14, weight: .semibold))
                 }
                 .frame(maxWidth: .infinity)
@@ -162,7 +164,7 @@ struct MainPopoverView: View {
 
     private var inactiveView: some View {
         VStack(spacing: 14) {
-            Text("Ekranı Uyanık Tut")
+            Text(L.s(.keepScreenAwake))
                 .font(.system(size: 12, weight: .medium))
                 .foregroundColor(t.textSecondary)
                 .padding(.top, 10)
@@ -189,11 +191,11 @@ struct MainPopoverView: View {
                     VStack(spacing: 5) {
                         Text(profile.icon)
                             .font(.title2)
-                        Text(profile.rawValue)
+                        Text(profile.localizedName(L))
                             .font(.system(size: 10, weight: .semibold))
                             .foregroundColor(t.textPrimary)
                             .lineLimit(1)
-                        Text(profile.description)
+                        Text(profile.localizedDescription(L))
                             .font(.system(size: 9))
                             .foregroundColor(t.textTertiary)
                     }
@@ -216,14 +218,14 @@ struct MainPopoverView: View {
     private var quickDurationButtons: some View {
         VStack(spacing: 7) {
             HStack {
-                Text("Hızlı Başlat")
+                Text(L.s(.quickStart))
                     .font(.system(size: 11, weight: .medium))
                     .foregroundColor(t.textSecondary)
                 Spacer()
                 Button(action: { withAnimation(.easeInOut(duration: 0.25)) { showCustomPicker.toggle() } }) {
                     HStack(spacing: 3) {
                         Image(systemName: "slider.horizontal.3")
-                        Text("Özel")
+                        Text(L.s(.custom))
                     }
                     .font(.system(size: 11))
                     .foregroundColor(t.accent)
@@ -234,7 +236,7 @@ struct MainPopoverView: View {
             HStack(spacing: 5) {
                 ForEach(CaffeineManager.presetDurations, id: \.seconds) { preset in
                     Button(action: { caffeineManager.start(seconds: preset.seconds) }) {
-                        Text(preset.label)
+                        Text(L.s(preset.key))
                             .font(.system(size: 11, weight: .semibold))
                             .foregroundColor(t.accent)
                             .frame(maxWidth: .infinity)
@@ -256,7 +258,7 @@ struct MainPopoverView: View {
 
     private var customDurationPicker: some View {
         VStack(spacing: 10) {
-            Text("Özel Süre: \(formattedCustomDuration)")
+            Text("\(L.s(.customDuration)): \(formattedCustomDuration)")
                 .font(.system(size: 12, weight: .medium))
                 .foregroundColor(t.textSecondary)
 
@@ -270,7 +272,7 @@ struct MainPopoverView: View {
                 HStack(spacing: 6) {
                     Image(systemName: "play.fill")
                         .font(.system(size: 11))
-                    Text("\(formattedCustomDuration) Başlat")
+                    Text("\(formattedCustomDuration) \(L.s(.startButton))")
                         .font(.system(size: 13, weight: .semibold))
                 }
                 .frame(maxWidth: .infinity)
@@ -302,8 +304,8 @@ struct MainPopoverView: View {
     private var formattedCustomDuration: String {
         let h = Int(customHours)
         let m = Int((customHours - Double(h)) * 60)
-        if m == 0 { return "\(h) saat" }
-        return "\(h) saat \(m) dk"
+        if m == 0 { return "\(h) \(L.s(.hours))" }
+        return "\(h) \(L.s(.hours)) \(m) \(L.s(.minutes))"
     }
 
     // MARK: - Brightness Control
@@ -314,7 +316,7 @@ struct MainPopoverView: View {
                 Image(systemName: "sun.max.fill")
                     .foregroundColor(t.accent)
                     .font(.system(size: 12))
-                Text("Ekran Parlaklığı")
+                Text(L.s(.screenBrightness))
                     .font(.system(size: 12, weight: .medium))
                     .foregroundColor(t.textSecondary)
                 Spacer()
@@ -405,13 +407,13 @@ struct MainPopoverView: View {
 
     private var footerStats: some View {
         HStack {
-            Label("\(caffeineManager.sessionCount) oturum", systemImage: "bolt.fill")
+            Label("\(caffeineManager.sessionCount) \(L.s(.sessionCount))", systemImage: "bolt.fill")
                 .font(.system(size: 10))
                 .foregroundColor(t.textTertiary)
 
             Spacer()
 
-            Label("Bugün \(caffeineManager.dailyMinutes) dk", systemImage: "clock.fill")
+            Label("\(L.s(.todayMinutes)) \(caffeineManager.dailyMinutes) \(L.s(.minutes))", systemImage: "clock.fill")
                 .font(.system(size: 10))
                 .foregroundColor(t.textTertiary)
 
@@ -437,9 +439,11 @@ struct MainPopoverView: View {
 struct SettingsView: View {
     @ObservedObject var themeManager: ThemeManager
     @ObservedObject var quotesManager: QuotesManager
+    @ObservedObject var localizationManager: LocalizationManager
     @State private var showQuoteEditor = false
 
     private var t: AppTheme { themeManager.theme }
+    private var L: LocalizationManager { localizationManager }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -447,14 +451,14 @@ struct SettingsView: View {
             HStack {
                 Image(systemName: "gearshape.fill")
                     .foregroundColor(t.accent)
-                Text("Ayarlar")
+                Text(L.s(.settings))
                     .font(.headline)
                     .foregroundColor(t.textPrimary)
             }
 
             // Theme Mode
             VStack(alignment: .leading, spacing: 8) {
-                Text("Tema Modu")
+                Text(L.s(.themeMode))
                     .font(.system(size: 12, weight: .semibold))
                     .foregroundColor(t.textSecondary)
 
@@ -464,7 +468,7 @@ struct SettingsView: View {
                             HStack(spacing: 4) {
                                 Text(mode.icon)
                                     .font(.system(size: 12))
-                                Text(mode.rawValue)
+                                Text(mode.localizedName(L))
                                     .font(.system(size: 11, weight: .medium))
                             }
                             .frame(maxWidth: .infinity)
@@ -486,7 +490,7 @@ struct SettingsView: View {
 
             // Color Palette
             VStack(alignment: .leading, spacing: 8) {
-                Text("Renk Paleti")
+                Text(L.s(.colorPalette))
                     .font(.system(size: 12, weight: .semibold))
                     .foregroundColor(t.textSecondary)
 
@@ -514,7 +518,7 @@ struct SettingsView: View {
                                 }
                                 .shadow(color: palette.accent.opacity(themeManager.palette == palette ? 0.5 : 0), radius: 6)
 
-                                Text(palette.rawValue)
+                                Text(palette.localizedName(L))
                                     .font(.system(size: 9, weight: .medium))
                                     .foregroundColor(themeManager.palette == palette ? t.textPrimary : t.textTertiary)
                             }
@@ -536,12 +540,49 @@ struct SettingsView: View {
 
             Divider()
 
+            // Language
+            VStack(alignment: .leading, spacing: 8) {
+                Text(L.s(.language))
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundColor(t.textSecondary)
+
+                LazyVGrid(columns: [
+                    GridItem(.flexible()),
+                    GridItem(.flexible())
+                ], spacing: 6) {
+                    ForEach(AppLanguage.allCases) { lang in
+                        Button(action: { localizationManager.language = lang }) {
+                            HStack(spacing: 4) {
+                                Text(lang.flag)
+                                    .font(.system(size: 12))
+                                Text(lang.displayName)
+                                    .font(.system(size: 10, weight: .medium))
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 6)
+                            .background(
+                                RoundedRectangle(cornerRadius: 6)
+                                    .fill(localizationManager.language == lang ? t.accentBg : t.cardBg)
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 6)
+                                            .stroke(localizationManager.language == lang ? t.accent.opacity(0.4) : t.border, lineWidth: 1)
+                                    )
+                            )
+                            .foregroundColor(localizationManager.language == lang ? t.accent : t.textSecondary)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+            }
+
+            Divider()
+
             // Quote Editor Link
             Button(action: { showQuoteEditor.toggle() }) {
                 HStack {
                     Image(systemName: "quote.bubble.fill")
                         .foregroundColor(t.accent)
-                    Text("Sözleri Düzenle")
+                    Text(L.s(.editQuotes))
                         .font(.system(size: 12, weight: .medium))
                         .foregroundColor(t.textPrimary)
                     Spacer()
@@ -557,7 +598,7 @@ struct SettingsView: View {
             }
             .buttonStyle(.plain)
             .popover(isPresented: $showQuoteEditor) {
-                QuoteEditorView(quotesManager: quotesManager, theme: t)
+                QuoteEditorView(quotesManager: quotesManager, theme: t, localizationManager: localizationManager)
             }
 
             Divider()
@@ -569,7 +610,7 @@ struct SettingsView: View {
                 HStack {
                     Image(systemName: "power")
                         .foregroundColor(.red)
-                    Text("Kapat.ma'yı Kapat")
+                    Text(L.s(.quitApp))
                         .font(.system(size: 12, weight: .medium))
                         .foregroundColor(.red)
                 }
@@ -587,23 +628,25 @@ struct SettingsView: View {
 struct QuoteEditorView: View {
     @ObservedObject var quotesManager: QuotesManager
     let theme: AppTheme
+    @ObservedObject var localizationManager: LocalizationManager
     @State private var newText = ""
     @State private var newAuthor = ""
+    private var L: LocalizationManager { localizationManager }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Motivasyon Sözleri")
+            Text(L.s(.motivationalQuotes))
                 .font(.headline)
                 .foregroundColor(theme.textPrimary)
 
             // Add new
             VStack(spacing: 6) {
-                TextField("Söz yazın...", text: $newText)
+                TextField(L.s(.writeQuote), text: $newText)
                     .textFieldStyle(.roundedBorder)
                     .font(.system(size: 12))
 
                 HStack {
-                    TextField("Yazar (opsiyonel)", text: $newAuthor)
+                    TextField(L.s(.authorOptional), text: $newAuthor)
                         .textFieldStyle(.roundedBorder)
                         .font(.system(size: 12))
 
@@ -659,7 +702,7 @@ struct QuoteEditorView: View {
 
             HStack {
                 Spacer()
-                Button("Varsayılanlara Sıfırla") {
+                Button(L.s(.resetDefaults)) {
                     quotesManager.quotes = QuotesManager.defaultQuotes
                 }
                 .font(.system(size: 10))

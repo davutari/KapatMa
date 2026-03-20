@@ -42,7 +42,7 @@ class QuotesManager: ObservableObject {
 
     var currentQuote: Quote {
         guard !quotes.isEmpty else {
-            return Quote(text: "Harika işler başarmak için çalışmaya devam et!")
+            return Quote(text: LocalizationManager.shared.s(.defaultQuote))
         }
         return quotes[currentQuoteIndex % quotes.count]
     }

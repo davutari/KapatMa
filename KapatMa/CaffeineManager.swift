@@ -18,11 +18,11 @@ class CaffeineManager: ObservableObject {
     // MARK: - Profiles
 
     enum CaffeineProfile: String, CaseIterable, Identifiable {
-        case quickMeeting = "Toplantı"
-        case deepWork = "Derin Çalışma"
-        case longCompute = "Uzun Hesaplama"
-        case overnight = "Gece Boyu"
-        case infinite = "Sınırsız"
+        case quickMeeting
+        case deepWork
+        case longCompute
+        case overnight
+        case infinite
 
         var id: String { rawValue }
 
@@ -46,24 +46,34 @@ class CaffeineManager: ObservableObject {
             }
         }
 
-        var description: String {
+        func localizedName(_ L: LocalizationManager) -> String {
             switch self {
-            case .quickMeeting: return "1 Saat"
-            case .deepWork: return "4 Saat"
-            case .longCompute: return "8 Saat"
-            case .overnight: return "12 Saat"
-            case .infinite: return "Sınırsız"
+            case .quickMeeting: return L.s(.profileMeeting)
+            case .deepWork: return L.s(.profileDeepWork)
+            case .longCompute: return L.s(.profileLongCompute)
+            case .overnight: return L.s(.profileOvernight)
+            case .infinite: return L.s(.profileUnlimited)
+            }
+        }
+
+        func localizedDescription(_ L: LocalizationManager) -> String {
+            switch self {
+            case .quickMeeting: return L.s(.profileMeetingDesc)
+            case .deepWork: return L.s(.profileDeepWorkDesc)
+            case .longCompute: return L.s(.profileLongComputeDesc)
+            case .overnight: return L.s(.profileOvernightDesc)
+            case .infinite: return L.s(.profileUnlimitedDesc)
             }
         }
     }
 
-    static let presetDurations: [(label: String, seconds: Int)] = [
-        ("30 dk", 1800),
-        ("1 sa", 3600),
-        ("2 sa", 7200),
-        ("4 sa", 14400),
-        ("8 sa", 28800),
-        ("12 sa", 43200),
+    static let presetDurations: [(key: L10nKey, seconds: Int)] = [
+        (.dur30m, 1800),
+        (.dur1h, 3600),
+        (.dur2h, 7200),
+        (.dur4h, 14400),
+        (.dur8h, 28800),
+        (.dur12h, 43200),
     ]
 
     init() {
@@ -99,10 +109,11 @@ class CaffeineManager: ObservableObject {
             saveStats()
             startCountdown()
 
+            let L = LocalizationManager.shared
             if let secs = seconds, secs > 300 {
                 scheduleNotification(
-                    title: "🔓 Kapat.ma",
-                    body: "Ekran uyanık kalma süresi 5 dakika içinde sona erecek.",
+                    title: L.s(.notifWarningTitle),
+                    body: L.s(.notifWarningBody),
                     delay: TimeInterval(secs - 300)
                 )
             }
@@ -157,9 +168,10 @@ class CaffeineManager: ObservableObject {
                 self.remainingSeconds -= 1
             } else {
                 self.stop()
+                let L = LocalizationManager.shared
                 self.scheduleNotification(
-                    title: "🔒 Kapat.ma",
-                    body: "Ekran uyanık kalma süresi sona erdi.",
+                    title: L.s(.notifEndTitle),
+                    body: L.s(.notifEndBody),
                     delay: 0
                 )
             }
