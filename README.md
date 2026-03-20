@@ -5,8 +5,8 @@
 <h1 align="center">Kapat.ma</h1>
 
 <p align="center">
-  <strong>Keep your Mac awake, beautifully.</strong><br>
-  A sleek macOS menu bar app that prevents your screen from sleeping.
+  <strong>Keep your Mac awake. Control your display.</strong><br>
+  A lightweight macOS menu bar app that prevents screen sleep and controls external monitor brightness.
 </p>
 
 <p align="center">
@@ -37,22 +37,30 @@
 ## Features
 
 ### Menu Bar Integration
-- Lives in your menu bar with a clean icon
+- Lives in your menu bar with a clean lock icon
 - **Locked** when inactive, **Unlocked + countdown** when active
 - Zero dock clutter &mdash; no dock icon, no windows
+
+### External Monitor Brightness Control
+- Automatically detects connected external monitors
+- Per-display brightness slider with real-time adjustment
+- **DDC/CI** hardware control for supported monitors (HDMI / DisplayPort)
+- **Gamma overlay** fallback for monitors without DDC support
+- Auto-hides when no external monitor is connected
+- Polls every 5 seconds for hotplug detection
 
 ### 5 Built-in Profiles
 
 | Profile | Duration | Use Case |
 |---------|----------|----------|
-| Meeting | 1 hour | Quick calls & meetings |
-| Deep Work | 4 hours | Focused coding sessions |
-| Long Compute | 8 hours | Builds, renders, ML training |
-| Overnight | 12 hours | Long-running tasks |
-| Unlimited | Infinite | Until you say stop |
+| Toplantı | 1 hour | Quick calls & meetings |
+| Derin Çalışma | 4 hours | Focused coding sessions |
+| Uzun Hesaplama | 8 hours | Builds, renders, ML training |
+| Gece Boyu | 12 hours | Long-running overnight tasks |
+| Sınırsız | Infinite | Until you say stop |
 
 ### Quick Start Presets
-One-click duration buttons: **30m, 1h, 2h, 4h, 8h, 12h**
+One-click duration buttons: **30dk, 1sa, 2sa, 4sa, 8sa, 12sa**
 
 ### Custom Duration
 Slider-based picker from **30 minutes to 24 hours** with half-hour steps.
@@ -85,7 +93,7 @@ Toggle the popover from anywhere with **`Cmd + Shift + K`**
 
 ## How It Works
 
-Kapat.ma uses the native macOS `caffeinate` command under the hood to prevent your Mac from sleeping. It runs as a lightweight menu bar app with no dock presence, keeping your workflow clean and distraction-free.
+Kapat.ma uses the native macOS `caffeinate` command to prevent your Mac from sleeping. For external monitor brightness, it communicates over **DDC/CI** (Display Data Channel) via IOKit's I2C interface to send hardware brightness commands. On monitors that don't support DDC, it falls back to **CoreGraphics gamma table** manipulation for software-level brightness control.
 
 ---
 
@@ -98,7 +106,7 @@ Kapat.ma uses the native macOS `caffeinate` command under the hood to prevent yo
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/AriDavut662/KapatMa.git
+   git clone https://github.com/davutari/KapatMa.git
    ```
 
 2. Open the project in Xcode:
@@ -111,7 +119,7 @@ Kapat.ma uses the native macOS `caffeinate` command under the hood to prevent yo
 
 4. Look for the lock icon in your menu bar
 
-> **Note:** App Sandbox must be disabled for `caffeinate` to work. This is already configured in the project settings.
+> **Note:** App Sandbox is disabled for `caffeinate` and IOKit I2C access to work. This is already configured in the project settings.
 
 ---
 
@@ -119,14 +127,18 @@ Kapat.ma uses the native macOS `caffeinate` command under the hood to prevent yo
 
 ```
 KapatMa/
-├── KapatMaApp.swift          # App entry point + menu bar setup
-├── CaffeineManager.swift     # caffeinate process management
-├── QuotesManager.swift       # Motivational quotes engine
-├── ThemeManager.swift        # Theme & color palette system
-├── MainPopoverView.swift     # All UI views (main, settings, quotes editor)
-├── Info.plist                # App configuration (LSUIElement = true)
-├── KapatMa.entitlements      # Sandbox disabled
-└── Assets.xcassets/          # App icons & colors
+├── KapatMaApp.swift              # App entry point + menu bar setup
+├── CaffeineManager.swift         # caffeinate process management
+├── BrightnessManager.swift       # External display brightness control
+├── DDCHelper.h                   # DDC/CI C API header
+├── DDCHelper.c                   # IOKit I2C DDC/CI implementation
+├── KapatMa-Bridging-Header.h     # C → Swift bridge
+├── QuotesManager.swift           # Motivational quotes engine
+├── ThemeManager.swift            # Theme & color palette system
+├── MainPopoverView.swift         # All UI views (main, settings, quotes editor)
+├── Info.plist                    # App configuration (LSUIElement = true)
+├── KapatMa.entitlements          # Sandbox disabled
+└── Assets.xcassets/              # App icons & colors
 ```
 
 ---
@@ -138,6 +150,8 @@ KapatMa/
 | **SwiftUI** | User interface |
 | **AppKit** | Menu bar integration (NSStatusItem, NSPopover) |
 | **caffeinate** | Native macOS sleep prevention |
+| **IOKit / I2C** | DDC/CI hardware brightness control |
+| **CoreGraphics** | Gamma-based software brightness fallback |
 | **UserDefaults** | Settings & stats persistence |
 | **UNUserNotificationCenter** | Timer notifications |
 
