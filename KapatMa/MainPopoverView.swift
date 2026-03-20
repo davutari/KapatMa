@@ -355,7 +355,7 @@ struct MainPopoverView: View {
                                 get: { Double(display.brightness) },
                                 set: { brightnessManager.setBrightness(Int($0), for: display.id) }
                             ),
-                            in: 0...100,
+                            in: 16...100,
                             step: 1
                         )
                         .accentColor(t.accent)
@@ -509,11 +509,12 @@ struct SettingsView: View {
 
                                     if themeManager.palette == palette {
                                         Circle()
-                                            .stroke(Color.white, lineWidth: 2)
-                                            .frame(width: 28, height: 28)
+                                            .stroke(t.isDark ? Color.white : Color.black.opacity(0.3), lineWidth: 2.5)
+                                            .frame(width: 32, height: 32)
                                         Image(systemName: "checkmark")
                                             .font(.system(size: 10, weight: .bold))
                                             .foregroundColor(.white)
+                                            .shadow(color: .black.opacity(0.5), radius: 1, x: 0, y: 0)
                                     }
                                 }
                                 .shadow(color: palette.accent.opacity(themeManager.palette == palette ? 0.5 : 0), radius: 6)
@@ -526,10 +527,10 @@ struct SettingsView: View {
                             .padding(.vertical, 8)
                             .background(
                                 RoundedRectangle(cornerRadius: 8)
-                                    .fill(themeManager.palette == palette ? t.elevatedBg : Color.clear)
+                                    .fill(themeManager.palette == palette ? t.accentBg : Color.clear)
                                     .overlay(
                                         RoundedRectangle(cornerRadius: 8)
-                                            .stroke(themeManager.palette == palette ? palette.accent.opacity(0.3) : Color.clear, lineWidth: 1)
+                                            .stroke(themeManager.palette == palette ? palette.accent.opacity(0.4) : Color.clear, lineWidth: 1)
                                     )
                             )
                         }

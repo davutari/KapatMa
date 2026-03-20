@@ -70,7 +70,7 @@ class BrightnessManager: ObservableObject {
 
     func setBrightness(_ percentage: Int, for displayID: CGDirectDisplayID) {
         guard let idx = displays.firstIndex(where: { $0.id == displayID }) else { return }
-        let clamped = max(0, min(100, percentage))
+        let clamped = max(16, min(100, percentage))
         displays[idx].brightness = clamped
 
         let usesDDC = displays[idx].supportsDDC
