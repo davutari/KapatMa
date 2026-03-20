@@ -1,5 +1,6 @@
 import Foundation
 import Combine
+import IOKit.pwr_mgt
 import UserNotifications
 
 class CaffeineManager: ObservableObject {
@@ -11,7 +12,7 @@ class CaffeineManager: ObservableObject {
     @Published var dailyMinutes: Int = 0
     @Published var sessionCount: Int = 0
 
-    private var process: Process?
+    private var assertionID: IOPMAssertionID = IOPMAssertionID(0)
     private var countdownTimer: Timer?
     private let defaults = UserDefaults.standard
 
@@ -86,24 +87,26 @@ class CaffeineManager: ObservableObject {
     func start(seconds: Int?) {
         stop()
 
-        let proc = Process()
-        proc.executableURL = URL(fileURLWithPath: "/usr/bin/caffeinate")
-
         if let secs = seconds {
-            proc.arguments = ["-dims", "-t", "\(secs)"]
             totalSeconds = secs
             remainingSeconds = secs
             isInfinite = false
         } else {
-            proc.arguments = ["-dims"]
             totalSeconds = 0
             remainingSeconds = 0
             isInfinite = true
         }
 
-        do {
-            try proc.run()
-            process = proc
+        // Create power assertion to prevent display sleep and system idle sleep
+        let reason = "Kapat.ma keeping screen awake" as CFString
+        let result = IOPMAssertionCreateWithName(
+            kIOPMAssertionTypePreventUserIdleDisplaySleep as CFString,
+            IOPMAssertionLevel(kIOPMAssertionLevelOn),
+            reason,
+            &assertionID
+        )
+
+        if result == kIOReturnSuccess {
             isActive = true
             sessionCount += 1
             saveStats()
@@ -117,8 +120,8 @@ class CaffeineManager: ObservableObject {
                     delay: TimeInterval(secs - 300)
                 )
             }
-        } catch {
-            print("Failed to start caffeinate: \(error)")
+        } else {
+            print("Failed to create power assertion: \(result)")
         }
     }
 
@@ -126,23 +129,20 @@ class CaffeineManager: ObservableObject {
         countdownTimer?.invalidate()
         countdownTimer = nil
 
-        if let proc = process, proc.isRunning {
-            let pid = proc.processIdentifier
-            proc.interrupt() // SIGINT — caffeinate responds to this reliably
-            proc.waitUntilExit()
-
-            // Safety net: if interrupt didn't work, force kill by exact PID
-            if proc.isRunning {
-                kill(pid, SIGKILL)
-            }
+        if isActive {
+            IOPMAssertionRelease(assertionID)
+            assertionID = IOPMAssertionID(0)
         }
-        process = nil
+
+        let wasActive = isActive
         isActive = false
         isInfinite = false
 
-        let elapsed = totalSeconds - remainingSeconds
-        dailyMinutes += elapsed / 60
-        saveStats()
+        if wasActive {
+            let elapsed = totalSeconds - remainingSeconds
+            dailyMinutes += elapsed / 60
+            saveStats()
+        }
 
         UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
     }
