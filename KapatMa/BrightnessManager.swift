@@ -1,5 +1,6 @@
 import Foundation
 import CoreGraphics
+import Combine
 
 // MARK: - External Display Model
 
@@ -16,12 +17,19 @@ class BrightnessManager: ObservableObject {
 
     private var pollTimer: Timer?
     private var writeWorkItems: [CGDirectDisplayID: DispatchWorkItem] = [:]
+    private var languageCancellable: AnyCancellable?
 
     init() {
         refreshDisplays()
         pollTimer = Timer.scheduledTimer(withTimeInterval: 5.0, repeats: true) { [weak self] _ in
             self?.detectChanges()
         }
+        // Refresh display names when language changes
+        languageCancellable = LocalizationManager.shared.$language
+            .dropFirst()
+            .sink { [weak self] _ in
+                self?.refreshDisplays()
+            }
     }
 
     deinit {
