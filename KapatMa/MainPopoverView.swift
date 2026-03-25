@@ -48,8 +48,9 @@ struct MainPopoverView: View {
     private var headerSection: some View {
         HStack(spacing: 10) {
             // App icon - lock metaphor
-            Text(awakeManager.isActive ? "🔓" : "🔒")
+            Image(systemName: awakeManager.isActive ? "lock.open.fill" : "lock.fill")
                 .font(.title2)
+                .foregroundColor(t.accent)
 
             VStack(alignment: .leading, spacing: 1) {
                 Text("Kapat.ma")
