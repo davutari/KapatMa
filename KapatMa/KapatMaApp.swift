@@ -73,11 +73,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         if awakeManager.isActive {
             let remaining = awakeManager.formattedRemaining
-            button.image = NSImage(systemSymbolName: "lock.open.fill", accessibilityDescription: "Active")
+            button.image = NSImage(systemSymbolName: "cup.and.saucer.fill", accessibilityDescription: "Active")
             button.image?.isTemplate = true
             button.title = awakeManager.isInfinite ? " ∞" : " \(remaining)"
         } else {
-            button.image = NSImage(systemSymbolName: "lock.fill", accessibilityDescription: "Inactive")
+            button.image = NSImage(systemSymbolName: "cup.and.saucer", accessibilityDescription: "Inactive")
             button.image?.isTemplate = true
             button.title = ""
         }
